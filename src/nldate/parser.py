@@ -3,7 +3,6 @@ from datetime import date, timedelta
 
 from dateutil.parser import parse as dateutil_parse
 
-
 NUMBER_WORDS = {
     "a": 1,
     "an": 1,
@@ -185,35 +184,19 @@ def parse(s: str, today: date | None = None) -> date:
         return today - timedelta(days=1)
 
     # in X days
-    if (
-        len(tokens) == 3
-        and tokens[0] == "in"
-        and tokens[2] in UNITS
-    ):
+    if len(tokens) == 3 and tokens[0] == "in" and tokens[2] in UNITS:
         return parse_in_expression(tokens, today)
 
     # next week/day
-    if (
-        len(tokens) == 2
-        and tokens[0] == "next"
-        and tokens[1] in UNITS
-    ):
+    if len(tokens) == 2 and tokens[0] == "next" and tokens[1] in UNITS:
         return parse_next_expression(tokens, today)
 
     # X days ago
-    if (
-        len(tokens) == 3
-        and tokens[1] in UNITS
-        and tokens[2] in DIRECTIONS
-    ):
+    if len(tokens) == 3 and tokens[1] in UNITS and tokens[2] in DIRECTIONS:
         return parse_relative_expression(tokens, today)
 
     # X days before DATE
-    if (
-        len(tokens) >= 4
-        and tokens[1] in UNITS
-        and tokens[2] in {"before", "after"}
-    ):
+    if len(tokens) >= 4 and tokens[1] in UNITS and tokens[2] in {"before", "after"}:
         return parse_complex_expression(tokens)
 
     # absolute date fallback
