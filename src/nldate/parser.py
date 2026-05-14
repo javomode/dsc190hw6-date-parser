@@ -1,5 +1,6 @@
 import re
 from datetime import date, timedelta
+from typing import Optional
 
 from dateutil.parser import parse as dateutil_parse
 from dateutil.relativedelta import relativedelta
@@ -275,8 +276,9 @@ def parse_absolute_date(s: str) -> date:
         return dateutil_parse(s, fuzzy=False).date()
     except Exception:
         raise ValueError(f"Unsupported absolute date: {s}")
-    
-def parse_special_phrases(tokens, today):
+
+
+def parse_special_phrases(tokens: list[str], today: date) -> Optional[date]:
     if tokens == ["the", "day", "after", "tomorrow"]:
         return today + timedelta(days=2)
     if tokens == ["the", "day", "before", "yesterday"]:
@@ -318,7 +320,7 @@ def parse(s: str, today: date | None = None) -> date:
         and tokens[3] == "now"
     ):
         return parse_from_now_expression(tokens, today)
-    
+
     result = parse_special_phrases(tokens, today)
     if result is not None:
         return result
