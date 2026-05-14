@@ -140,6 +140,15 @@ def parse_next_expression(tokens: list[str], today: date) -> date:
     return today + delta
 
 
+def parse_from_now_expression(tokens: list[str], today: date) -> date:
+    quantity = parse_number(tokens[0])
+    unit = tokens[1]
+
+    delta = build_delta(quantity, unit)
+
+    return today + delta
+
+
 def parse_complex_expression(tokens: list[str]) -> date:
     """
     Handle:
@@ -205,6 +214,15 @@ def parse(s: str, today: date | None = None) -> date:
     # X days ago
     if len(tokens) == 3 and tokens[1] in UNITS and tokens[2] in DIRECTIONS:
         return parse_relative_expression(tokens, today)
+
+    # X weeks from now
+    if (
+        len(tokens) == 4
+        and tokens[2] == "from"
+        and tokens[3] == "now"
+        and tokens[1] in UNITS
+    ):
+        return parse_from_now_expression(tokens, today)
 
     # X days before DATE
     if len(tokens) >= 4 and tokens[1] in UNITS and tokens[2] in {"before", "after"}:
