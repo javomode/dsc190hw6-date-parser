@@ -2,6 +2,7 @@ import re
 from datetime import date, timedelta
 
 from dateutil.parser import parse as dateutil_parse
+from dateutil.relativedelta import relativedelta
 
 NUMBER_WORDS = {
     "a": 1,
@@ -23,6 +24,10 @@ UNITS = {
     "days": "days",
     "week": "weeks",
     "weeks": "weeks",
+    "month": "months",
+    "months": "months",
+    "year": "years",
+    "years": "years"
 }
 
 DIRECTIONS = {
@@ -57,7 +62,7 @@ def parse_number(token: str) -> int:
     raise ValueError(f"Unknown number: {token}")
 
 
-def build_delta(quantity: int, unit: str) -> timedelta:
+def build_delta(quantity: int, unit: str) -> timedelta | relativedelta:
     """
     Convert quantity + unit into timedelta.
     """
@@ -72,6 +77,12 @@ def build_delta(quantity: int, unit: str) -> timedelta:
 
     if normalized_unit == "weeks":
         return timedelta(weeks=quantity)
+    
+    if normalized_unit == "months":
+        return relativedelta(months=quantity)
+
+    if normalized_unit == "years":
+        return relativedelta(years=quantity)
 
     raise ValueError(f"Unsupported unit type: {unit}")
 
