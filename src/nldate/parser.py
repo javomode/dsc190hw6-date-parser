@@ -27,7 +27,7 @@ UNITS = {
     "month": "months",
     "months": "months",
     "year": "years",
-    "years": "years"
+    "years": "years",
 }
 
 DIRECTIONS = {
@@ -77,7 +77,7 @@ def build_delta(quantity: int, unit: str) -> timedelta | relativedelta:
 
     if normalized_unit == "weeks":
         return timedelta(weeks=quantity)
-    
+
     if normalized_unit == "months":
         return relativedelta(months=quantity)
 
