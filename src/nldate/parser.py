@@ -37,6 +37,16 @@ DIRECTIONS = {
     "later": 1,
 }
 
+WEEKDAYS = {
+    "monday": 0,
+    "tuesday": 1,
+    "wednesday": 2,
+    "thursday": 3,
+    "friday": 4,
+    "saturday": 5,
+    "sunday": 6,
+}
+
 
 def normalize_input(s: str) -> list[str]:
     """
@@ -140,6 +150,24 @@ def parse_next_expression(tokens: list[str], today: date) -> date:
     return today + delta
 
 
+def parse_next_weekday(tokens: list[str], today: date) -> date:
+    """
+    Handle:
+    - next Monday/Tuesday/...
+    """
+    weekday_name = tokens[1]
+    target = WEEKDAYS[weekday_name]
+
+    current = today.weekday()
+
+    days_ahead = target - current
+
+    if days_ahead <= 0:
+        days_ahead += 7
+
+    return today + timedelta(days=days_ahead)
+
+
 def parse_from_now_expression(tokens: list[str], today: date) -> date:
     quantity = parse_number(tokens[0])
     unit = tokens[1]
@@ -206,6 +234,10 @@ def parse(s: str, today: date | None = None) -> date:
     # in X days
     if len(tokens) == 3 and tokens[0] == "in" and tokens[2] in UNITS:
         return parse_in_expression(tokens, today)
+
+    # next Tuesday
+    if len(tokens) == 2 and tokens[0] == "next" and tokens[1] in WEEKDAYS:
+        return parse_next_weekday(tokens, today)
 
     # next week/day
     if len(tokens) == 2 and tokens[0] == "next" and tokens[1] in UNITS:

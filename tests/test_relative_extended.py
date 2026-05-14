@@ -25,3 +25,26 @@ def test_next_week():
 
 def test_next_day():
     assert parse("next day", today=date(2025, 1, 1)) == date(2025, 1, 2)
+
+
+def test_next_tuesday():
+    # assume today is Monday
+    assert parse(
+        "next tuesday",
+        today=date(2025, 1, 6),  # Monday
+    ) == date(2025, 1, 7)
+
+
+def test_next_tuesday_wrap():
+    # if today is Tuesday, next Tuesday is 7 days later
+    assert parse(
+        "next tuesday",
+        today=date(2025, 1, 7),  # Tuesday
+    ) == date(2025, 1, 14)
+
+
+def test_next_tuesday_midweek():
+    assert parse(
+        "next tuesday",
+        today=date(2025, 1, 8),  # Wednesday
+    ) == date(2025, 1, 14)
