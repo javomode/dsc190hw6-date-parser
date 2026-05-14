@@ -275,6 +275,13 @@ def parse_absolute_date(s: str) -> date:
         return dateutil_parse(s, fuzzy=False).date()
     except Exception:
         raise ValueError(f"Unsupported absolute date: {s}")
+    
+def parse_special_phrases(tokens, today):
+    if tokens == ["the", "day", "after", "tomorrow"]:
+        return today + timedelta(days=2)
+    if tokens == ["the", "day", "before", "yesterday"]:
+        return today - timedelta(days=2)
+    return None
 
 
 def parse(s: str, today: date | None = None) -> date:
@@ -311,6 +318,10 @@ def parse(s: str, today: date | None = None) -> date:
         and tokens[3] == "now"
     ):
         return parse_from_now_expression(tokens, today)
+    
+    result = parse_special_phrases(tokens, today)
+    if result is not None:
+        return result
 
     if "before" in tokens or "after" in tokens:
         if "before" in tokens:
