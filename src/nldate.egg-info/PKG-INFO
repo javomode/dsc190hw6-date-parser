@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: nldate
+Version: 0.1.0
+Summary: Natural language date parser
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: python-dateutil
+
+# dsc190hw6-date-parser
+Practice repo for DSC 190, HW6.
