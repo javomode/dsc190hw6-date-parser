@@ -228,6 +228,55 @@ def parse_complex_expression(tokens: list[str]) -> date:
     return base_date + delta
 
 
+def parse_compound_expression(tokens: list[str]) -> date:
+    """
+    Handle:
+    - 2 years, 3 months before Dec 1 2025
+    - 1 year 2 months after Jan 1 2020
+    """
+
+    # find direction index
+    if "before" in tokens:
+        direction = -1
+        split_idx = tokens.index("before")
+    elif "after" in tokens:
+        direction = 1
+        split_idx = tokens.index("after")
+    else:
+        raise ValueError("Missing before/after")
+
+    # left side = offsets
+    offset_tokens = tokens[:split_idx]
+    base_tokens = tokens[split_idx + 1 :]
+
+    base_date = dateutil_parse(" ".join(base_tokens)).date()
+
+    delta = relativedelta()
+
+    i = 0
+    while i < len(offset_tokens):
+        quantity = parse_number(offset_tokens[i])
+        unit = offset_tokens[i + 1]
+
+        normalized = UNITS[unit]
+
+        if normalized == "days":
+            delta += relativedelta(days=quantity)
+        elif normalized == "weeks":
+            delta += relativedelta(weeks=quantity)
+        elif normalized == "months":
+            delta += relativedelta(months=quantity)
+        elif normalized == "years":
+            delta += relativedelta(years=quantity)
+
+        i += 2
+
+    if direction == -1:
+        return base_date - delta
+    else:
+        return base_date + delta
+
+
 def parse_absolute_date(s: str) -> date:
     """
     Parse:
@@ -282,6 +331,13 @@ def parse(s: str, today: date | None = None) -> date:
         and tokens[1] in UNITS
     ):
         return parse_from_now_expression(tokens, today)
+
+    # compound offsets: 2 years, 3 months before DATE
+    if any(token in {"before", "after"} for token in tokens):
+        # must contain at least TWO unit patterns to be "compound"
+        unit_count = sum(token in UNITS for token in tokens)
+        if unit_count >= 2:
+            return parse_compound_expression(tokens)
 
     # X days before DATE
     if len(tokens) >= 4 and tokens[1] in UNITS and tokens[2] in {"before", "after"}:
