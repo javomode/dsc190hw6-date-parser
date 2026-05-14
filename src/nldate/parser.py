@@ -169,12 +169,35 @@ def parse_next_weekday(tokens: list[str], today: date) -> date:
 
 
 def parse_from_now_expression(tokens: list[str], today: date) -> date:
+    """
+    Handle:
+    - 5 days from now
+    - 3 months from now
+    """
     quantity = parse_number(tokens[0])
     unit = tokens[1]
 
     delta = build_delta(quantity, unit)
 
     return today + delta
+
+
+def parse_last_weekday(tokens: list[str], today: date) -> date:
+    """
+    Handle:
+    - last Monday/Tuesday/...
+    """
+    weekday_name = tokens[1]
+    target = WEEKDAYS[weekday_name]
+
+    current = today.weekday()
+
+    days_behind = current - target
+
+    if days_behind <= 0:
+        days_behind += 7
+
+    return today - timedelta(days=days_behind)
 
 
 def parse_complex_expression(tokens: list[str]) -> date:
@@ -242,6 +265,10 @@ def parse(s: str, today: date | None = None) -> date:
     # next week/day
     if len(tokens) == 2 and tokens[0] == "next" and tokens[1] in UNITS:
         return parse_next_expression(tokens, today)
+
+    # last Friday
+    if len(tokens) == 2 and tokens[0] == "last" and tokens[1] in WEEKDAYS:
+        return parse_last_weekday(tokens, today)
 
     # X days ago
     if len(tokens) == 3 and tokens[1] in UNITS and tokens[2] in DIRECTIONS:

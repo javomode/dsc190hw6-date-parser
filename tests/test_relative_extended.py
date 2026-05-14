@@ -48,3 +48,20 @@ def test_next_tuesday_midweek():
         "next tuesday",
         today=date(2025, 1, 8),  # Wednesday
     ) == date(2025, 1, 14)
+
+
+def test_last_friday():
+    # Saturday Jan 10 2026 → last Friday is Jan 9 2026
+    assert parse("last friday", today=date(2026, 1, 10)) == date(2026, 1, 9)
+
+
+def test_last_friday_same_week():
+    # Friday itself → last Friday is 7 days earlier
+    assert parse("last friday", today=date(2026, 1, 9)) == date(2026, 1, 2)
+
+
+def test_last_friday_midweek():
+    assert parse(
+        "last friday",
+        today=date(2026, 1, 14),  # Wednesday
+    ) == date(2026, 1, 9)
